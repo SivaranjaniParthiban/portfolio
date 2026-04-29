@@ -690,6 +690,28 @@
       opacity: 1;
       transform: translateY(0);
     }
+    /* Cursor Glow */
+#cursor-glow {
+  position: fixed;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(0,229,160,0.12), transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+
+/* Stagger Animation */
+.stagger {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.stagger.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
     /* RESPONSIVE */
     @media (max-width: 768px) {
@@ -704,7 +726,7 @@
   </style>
 </head>
 <body>
-
+<div id="cursor-glow"></div>
   <!-- NAV -->
   <nav>
     <div class="nav-logo">S<span>.</span>Parthiban</div>
@@ -724,7 +746,9 @@
       <div class="hero-tag">Available for opportunities</div>
       <h1>
         <div>Sivaranjani</div>
-        <div class="line2">Parthiban<span class="accent-word">.</span></div>
+       <div class="line2">
+  <span id="typing">Parthiban</span><span class="accent-word">.</span>
+</div>
       </h1>
       <p class="hero-sub">Java Full-Stack Developer with 3+ years delivering enterprise-scale web applications across automotive and internal enterprise domains.</p>
       <div class="hero-meta">
@@ -764,7 +788,7 @@
     <div class="section-label">// 01 — Technical Skills</div>
     <h2 class="section-title">What I work with</h2>
     <div class="skills-grid fade-up">
-      <div class="skill-group">
+      <div class="skill-group stagger">
         <div class="skill-group-label">Backend</div>
         <div class="skill-tags">
           <span class="skill-tag">Java 8/11</span>
@@ -840,7 +864,7 @@
         </div>
 
         <!-- Software Engineer -->
-        <div class="exp-role">
+        <div class="exp-role stagger fade-up">
           <div class="exp-role-header">
             <div class="exp-role-title">Software Engineer</div>
             <div class="exp-date">Jun 2025 — Present</div>
@@ -997,29 +1021,79 @@
 
   <script>
     // Intersection Observer for fade-up animations
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('visible'), i * 100);
-        }
-      });
-    }, { threshold: 0.1 });
+    // Fade + stagger animation
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
 
-    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-
-    // Active nav highlight
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-links a');
-
-    window.addEventListener('scroll', () => {
-      let current = '';
-      sections.forEach(s => {
-        if (window.scrollY >= s.offsetTop - 200) current = s.getAttribute('id');
+      const children = entry.target.querySelectorAll('.stagger');
+      children.forEach((child, index) => {
+        setTimeout(() => {
+          child.classList.add('visible');
+        }, index * 120);
       });
-      navLinks.forEach(a => {
-        a.style.color = a.getAttribute('href') === `#${current}` ? 'var(--accent)' : '';
-      });
-    });
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+
+// Typing effect
+const words = ["Parthiban", "Developer", "Engineer"];
+let i = 0, j = 0, deleting = false;
+
+function typeEffect() {
+  const el = document.getElementById("typing");
+  if (!el) return;
+
+  const word = words[i];
+  el.textContent = deleting ? word.substring(0, j--) : word.substring(0, j++);
+
+  if (j === word.length) deleting = true;
+  if (j === 0) {
+    deleting = false;
+    i = (i + 1) % words.length;
+  }
+
+  setTimeout(typeEffect, deleting ? 50 : 100);
+}
+typeEffect();
+
+
+// Cursor glow
+document.addEventListener('mousemove', e => {
+  const glow = document.getElementById('cursor-glow');
+  if (glow) {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+  }
+});
+
+
+// Magnetic buttons
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = 'translate(0,0)';
+  });
+});
+
+
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.background = window.scrollY > 50
+    ? 'rgba(10,10,15,0.95)'
+    : 'rgba(10,10,15,0.85)';
+});
   </script>
 </body>
 </html>
