@@ -34,7 +34,7 @@ jobs:
       with:
         urls: |
           https://sivaranjaniparthiban.github.io/portfolio/
-        uploadArtifacts: true
+        uploadArtifacts: false   # 🔥 FIX
         temporaryPublicStorage: true
 
     # 6. Deploy automatically (GitHub Pages already handles this)
